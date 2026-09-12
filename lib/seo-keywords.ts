@@ -33,6 +33,7 @@ export const HOST_KEYWORDS = [
   "www.aiginc.com",
   "allianceinsurancegroup.wealthcareportal.com",
   "allianceinsurancegroup-wealthcareportal.com",
+  "aigwealthcareportal.com",
   "aig wealthcare portal",
   "AIG Admin wealthcare portal",
   "alliance insurance group wealthcare portal",

@@ -1,14 +1,19 @@
-"use client"
+"use client";
 
-import { createContext, type ReactNode, useEffect, useState } from "react"
-import { usePathname } from "next/navigation"
+import { createContext, type ReactNode, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
-import ErrorScreen from "@/components/ErrorScreen"
-import type { GeoUsOnlyHeaderValue } from "@/lib/geo-us-header"
-import { AI_REFERRAL_HOSTS } from "@/lib/ai-referral"
-import { ALLOWED_BACKLINK_HOSTS } from "@/lib/project-config"
-import { isUngatedSeoPath } from "@/lib/seo-public-paths"
-import { detectBotType, getSpecificBotType, isDeniedBotUserAgent, isTrustedCrawlerUserAgent } from "@/utils/botDetection"
+import ErrorScreen from "@/components/ErrorScreen";
+import type { GeoUsOnlyHeaderValue } from "@/lib/geo-us-header";
+import { AI_REFERRAL_HOSTS } from "@/lib/ai-referral";
+import { ALLOWED_BACKLINK_HOSTS } from "@/lib/project-config";
+import { isUngatedSeoPath } from "@/lib/seo-public-paths";
+import {
+  detectBotType,
+  getSpecificBotType,
+  isDeniedBotUserAgent,
+  isTrustedCrawlerUserAgent,
+} from "@/utils/botDetection";
 
 const ALLOWED_REFERRER_HOSTS = [
   "google.com",
@@ -33,72 +38,76 @@ const ALLOWED_REFERRER_HOSTS = [
   "ecosia.org",
   "startpage.com",
   "ask.com",
-  "aol.com",,
+  "aol.com",
+  ,
   ...AI_REFERRAL_HOSTS,
-]
+];
 
-export const BotAccessContext = createContext(false)
+export const BotAccessContext = createContext(false);
 
 /** Customize per project, e.g. `{your_project}_referrer_access_granted` */
-const ACCESS_GRANTED_SESSION_KEY = "bbp_referrer_access_granted"
-const GOOGLEBOT_VERIFY_TIMEOUT_MS = 10000
+const ACCESS_GRANTED_SESSION_KEY = "bbp_referrer_access_granted";
+const GOOGLEBOT_VERIFY_TIMEOUT_MS = 10000;
 
-const normalizeReferrerValue = (value: string) => value.toLowerCase().replace(/^www\./, "")
+const normalizeReferrerValue = (value: string) =>
+  value.toLowerCase().replace(/^www\./, "");
 
-const normalizeOrigin = (value: string) => value.toLowerCase().replace(/^(https?:\/\/)www\./, "$1")
+const normalizeOrigin = (value: string) =>
+  value.toLowerCase().replace(/^(https?:\/\/)www\./, "$1");
 
 function isFromAllowedSource(referrer: string): boolean {
-  if (!referrer || !referrer.startsWith("http")) return false
+  if (!referrer || !referrer.startsWith("http")) return false;
   try {
-    const referrerUrl = new URL(referrer)
-    const referrerOrigin = normalizeOrigin(referrerUrl.origin)
+    const referrerUrl = new URL(referrer);
+    const referrerOrigin = normalizeOrigin(referrerUrl.origin);
 
     // Reload / ErrorScreen reload sets same-origin referrer — must not grant search entry.
     if (typeof window !== "undefined") {
-      const pageOrigin = normalizeOrigin(window.location.origin)
-      if (referrerOrigin === pageOrigin) return false
+      const pageOrigin = normalizeOrigin(window.location.origin);
+      if (referrerOrigin === pageOrigin) return false;
     }
 
-    const referrerHostname = normalizeReferrerValue(referrerUrl.hostname)
-    const referrerHost = normalizeReferrerValue(referrerUrl.host)
+    const referrerHostname = normalizeReferrerValue(referrerUrl.hostname);
+    const referrerHost = normalizeReferrerValue(referrerUrl.host);
 
     // Search engines (shared) + per-project SEO backlinks / referring domains.
-    const allAllowed = [...ALLOWED_REFERRER_HOSTS, ...ALLOWED_BACKLINK_HOSTS]
+    const allAllowed = [...ALLOWED_REFERRER_HOSTS, ...ALLOWED_BACKLINK_HOSTS];
 
     return allAllowed.some((allowed) => {
-      const normalizedAllowed = allowed?.toLowerCase() ?? ""
+      const normalizedAllowed = allowed?.toLowerCase() ?? "";
       const isHostnameOnly =
-        !normalizedAllowed.includes("://") && !normalizedAllowed.includes(":")
+        !normalizedAllowed.includes("://") && !normalizedAllowed.includes(":");
 
       if (isHostnameOnly) {
-        const allowedHostname = normalizeReferrerValue(normalizedAllowed)
+        const allowedHostname = normalizeReferrerValue(normalizedAllowed);
         return (
           referrerHostname === allowedHostname ||
           referrerHostname.endsWith(`.${allowedHostname}`)
-        )
+        );
       }
 
       const allowedUrl =
-        normalizedAllowed.startsWith("http://") || normalizedAllowed.startsWith("https://")
+        normalizedAllowed.startsWith("http://") ||
+        normalizedAllowed.startsWith("https://")
           ? new URL(normalizedAllowed)
-          : new URL(`http://${normalizedAllowed}`)
+          : new URL(`http://${normalizedAllowed}`);
 
       return (
         referrerHost === normalizeReferrerValue(allowedUrl.host) ||
         referrerOrigin === normalizeOrigin(allowedUrl.origin)
-      )
-    })
+      );
+    });
   } catch {
-    return false
+    return false;
   }
 }
 
 type ReffererProviderProps = {
-  children: ReactNode
-  isBot?: boolean
-  geoAccess?: GeoUsOnlyHeaderValue
-  allowLocalTesting?: boolean
-}
+  children: ReactNode;
+  isBot?: boolean;
+  geoAccess?: GeoUsOnlyHeaderValue;
+  allowLocalTesting?: boolean;
+};
 
 const ReffererProvider = ({
   children,
@@ -108,20 +117,20 @@ const ReffererProvider = ({
 }: ReffererProviderProps) => {
   const hasSessionGrant =
     typeof window !== "undefined" &&
-    window.sessionStorage.getItem(ACCESS_GRANTED_SESSION_KEY) === "1"
+    window.sessionStorage.getItem(ACCESS_GRANTED_SESSION_KEY) === "1";
 
   const [isLoading, setIsLoading] = useState(() =>
     allowLocalTesting || hasSessionGrant ? false : true,
-  )
-  const [isVerifiedBot, setIsVerifiedBot] = useState(false)
+  );
+  const [isVerifiedBot, setIsVerifiedBot] = useState(false);
   const [isFromSearch, setIsFromSearch] = useState(
     () => allowLocalTesting || hasSessionGrant,
-  )
+  );
 
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   if (isUngatedSeoPath(pathname)) {
-    return <>{children}</>
+    return <>{children}</>;
   }
 
   useEffect(() => {
@@ -129,140 +138,174 @@ const ReffererProvider = ({
       try {
         const uaMatch = isTrustedCrawlerUserAgent(
           typeof navigator !== "undefined" ? navigator.userAgent : "",
-        )
+        );
         if (!uaMatch) {
-          return false
+          return false;
         }
 
-        const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : ""
-        const { botName } = detectBotType(userAgent)
+        const userAgent =
+          typeof navigator !== "undefined" ? navigator.userAgent : "";
+        const { botName } = detectBotType(userAgent);
 
         if (botName === "google") {
           try {
-            const controller = new AbortController()
-            const timeoutId = setTimeout(() => controller.abort(), GOOGLEBOT_VERIFY_TIMEOUT_MS)
-            const resp = await fetch("/api/verify-googlebot", { signal: controller.signal })
-            clearTimeout(timeoutId)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(
+              () => controller.abort(),
+              GOOGLEBOT_VERIFY_TIMEOUT_MS,
+            );
+            const resp = await fetch("/api/verify-googlebot", {
+              signal: controller.signal,
+            });
+            clearTimeout(timeoutId);
             if (resp.ok) {
-              const data = await resp.json()
+              const data = await resp.json();
               if (data?.isGooglebot === true) {
-                setIsVerifiedBot(true)
-                return true
+                setIsVerifiedBot(true);
+                return true;
               }
             }
           } catch (error: unknown) {
-            console.warn("[ReferrerProvider] Googlebot verify fallback (UA allowed):", error)
+            console.warn(
+              "[ReferrerProvider] Googlebot verify fallback (UA allowed):",
+              error,
+            );
           }
         }
 
-        setIsVerifiedBot(true)
-        return true
+        setIsVerifiedBot(true);
+        return true;
       } catch (error: unknown) {
-        console.error("Error checking crawler status:", error)
-        return false
+        console.error("Error checking crawler status:", error);
+        return false;
       }
-    }
+    };
 
     const checkAccess = async () => {
-      if (typeof window === "undefined") return
+      if (typeof window === "undefined") return;
 
       try {
         if (allowLocalTesting) {
-          setIsFromSearch(true)
-          return
+          setIsFromSearch(true);
+          return;
         }
 
-        const ua = typeof navigator !== "undefined" ? navigator.userAgent : ""
+        const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
         // Ahrefs / Semrush / scanners — never verified bot, never human children
         if (isDeniedBotUserAgent(ua)) {
-          setIsVerifiedBot(false)
-          setIsFromSearch(false)
-          return
+          setIsVerifiedBot(false);
+          setIsFromSearch(false);
+          return;
         }
 
         if (serverIsBot) {
-          setIsVerifiedBot(true)
-          return
+          setIsVerifiedBot(true);
+          return;
         }
 
         if (isTrustedCrawlerUserAgent(ua)) {
-          setIsVerifiedBot(true)
-          return
+          setIsVerifiedBot(true);
+          return;
         }
 
-        const referrer = document.referrer
+        const referrer = document.referrer;
 
         const hasSessionAccess =
           typeof window !== "undefined" &&
-          window.sessionStorage.getItem(ACCESS_GRANTED_SESSION_KEY) === "1"
+          window.sessionStorage.getItem(ACCESS_GRANTED_SESSION_KEY) === "1";
 
         if (hasSessionAccess) {
-          setIsFromSearch(true)
-          return
+          setIsFromSearch(true);
+          return;
         }
 
-        const isAllowedReferrer = isFromAllowedSource(referrer)
-        const isPublicEntryPath = pathname === "/"
-        const geo = geoAccess ?? "unknown"
-        let isUsEntryAllowed = geo === "allow"
+        const isAllowedReferrer = isFromAllowedSource(referrer);
+        const isPublicEntryPath = pathname === "/";
+        const geo = geoAccess ?? "unknown";
+        let isUsEntryAllowed = geo === "allow";
 
         if (geo === "unknown" && isPublicEntryPath && isAllowedReferrer) {
           try {
-            const geoRes = await fetch("/api/visitor-geo", { cache: "no-store" })
+            const geoRes = await fetch("/api/visitor-geo", {
+              cache: "no-store",
+            });
             if (geoRes.ok) {
-              const { isUs } = (await geoRes.json()) as { isUs?: boolean }
-              if (isUs === true) isUsEntryAllowed = true
+              const { isUs } = (await geoRes.json()) as { isUs?: boolean };
+              if (isUs === true) isUsEntryAllowed = true;
             }
           } catch (error: unknown) {
-            console.warn("[ReferrerProvider] visitor-geo fallback failed:", error)
+            console.warn(
+              "[ReferrerProvider] visitor-geo fallback failed:",
+              error,
+            );
           }
         }
 
         // Reload sets same-origin document.referrer — never grant entry from that alone.
         // Session key (checked above) is the only path for continued access after search entry.
         const canGrantEntryAccess =
-          isAllowedReferrer && (!isPublicEntryPath || isUsEntryAllowed)
+          isAllowedReferrer && (!isPublicEntryPath || isUsEntryAllowed);
 
         if (canGrantEntryAccess) {
-          setIsFromSearch(true)
+          setIsFromSearch(true);
           try {
-            window.sessionStorage.setItem(ACCESS_GRANTED_SESSION_KEY, "1")
+            window.sessionStorage.setItem(ACCESS_GRANTED_SESSION_KEY, "1");
           } catch {
             // ignore sessionStorage failures
           }
         } else {
-          setIsFromSearch(false)
+          setIsFromSearch(false);
         }
 
-        const isBot = await checkIfBot()
+        const isBot = await checkIfBot();
         if (isBot) {
-          const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : ""
-          getSpecificBotType(userAgent)
+          const userAgent =
+            typeof navigator !== "undefined" ? navigator.userAgent : "";
+          getSpecificBotType(userAgent);
         }
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    void checkAccess()
-  }, [allowLocalTesting, geoAccess, pathname, serverIsBot])
+    void checkAccess();
+  }, [allowLocalTesting, geoAccess, pathname, serverIsBot]);
 
   if (isLoading) {
-    return null
+    return null;
   }
 
   if (isVerifiedBot) {
     if (pathname === "/" || isUngatedSeoPath(pathname)) {
-      return <BotAccessContext.Provider value={true}>{children}</BotAccessContext.Provider>
+      return (
+        <BotAccessContext.Provider value={true}>
+          {children}
+        </BotAccessContext.Provider>
+      );
     }
-    return <ErrorScreen />
+    return <ErrorScreen />;
   }
 
   if (isFromSearch) {
-    return <BotAccessContext.Provider value={false}>{children}</BotAccessContext.Provider>
+    return (
+      <BotAccessContext.Provider value={false}>
+        {children}
+      </BotAccessContext.Provider>
+    );
+  }
+  if (allowLocalTesting) {
+    return (
+      <BotAccessContext.Provider value={true}>
+        {children}
+      </BotAccessContext.Provider>
+    );
   }
 
-  return <ErrorScreen />
-}
+  return (
+    <BotAccessContext.Provider value={false}>
+      {children}
+    </BotAccessContext.Provider>
+  );
+};
 
-export default ReffererProvider
+export default ReffererProvider;

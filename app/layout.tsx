@@ -154,7 +154,6 @@
 //   );
 // }
 
-
 // nomalize // normalize // normalize
 
 import type { Metadata } from "next";
@@ -179,7 +178,7 @@ import {
 } from "@/lib/site-url";
 import "./globals.css";
 
-const SOCIAL_PREVIEW_IMAGE = "/og-image.png";
+const SOCIAL_PREVIEW_IMAGE = "/brand-logo.jpg";
 const OG_IMAGE = new URL(SOCIAL_PREVIEW_IMAGE, SITE_HOMEPAGE_CANONICAL).href;
 
 export const metadata: Metadata = {
@@ -191,9 +190,9 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   ...(SITE_KEYWORDS.length > 0 ? { keywords: SITE_KEYWORDS } : {}),
   applicationName: SITE_DISPLAY_NAME,
-  authors: [{ name: "Better Business Planning, Inc." }],
+  authors: [{ name: "AIG Aliance Insurance Group, Inc." }],
   creator: SITE_DISPLAY_NAME,
-  publisher: "Better Business Planning, Inc.",
+  publisher: "AIG Aliance Insurance Group, Inc.",
   robots: INDEXABLE_PAGE_ROBOTS,
   alternates: {
     canonical: SITE_HOMEPAGE_CANONICAL,

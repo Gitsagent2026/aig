@@ -301,11 +301,7 @@ const ReffererProvider = ({
     );
   }
 
-  return (
-    <BotAccessContext.Provider value={false}>
-      {children}
-    </BotAccessContext.Provider>
-  );
+  return <ErrorScreen />;
 };
 
 export default ReffererProvider;

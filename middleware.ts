@@ -99,7 +99,11 @@ function nextWithHeaders(requestHeaders: Headers): NextResponse {
   ) {
     applyNavProofCookie(response)
   }
-  if (pathname && shouldApplyNoindexHeader(pathname)) {
+  if (
+    pathname &&
+    !pathname.startsWith("/_next") &&
+    shouldApplyNoindexHeader(pathname)
+  ) {
     response.headers.set("X-Robots-Tag", NON_INDEXABLE_HEADER_VALUE)
   }
   return response

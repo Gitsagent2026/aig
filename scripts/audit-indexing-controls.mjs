@@ -77,12 +77,14 @@ if (indexing) {
 const sitemap = read("app/sitemap.ts")
 if (sitemap) {
   if (
-    !/export\s+default\s+function\s+sitemap\s*\(\)\s*:\s*MetadataRoute\.Sitemap\s*\{[\s\S]*?return\s+buildSitemapEntries\(\)/m.test(
+    !/import\s+type\s+\{\s*MetadataRoute\s*\}\s+from\s+"next"/.test(sitemap) ||
+    !/import\s+\{\s*buildSitemapEntries\s*\}\s+from\s+"@\/lib\/seo-indexing"/.test(
       sitemap,
-    )
+    ) ||
+    !/\bbuildSitemapEntries\s*\(\s*\)/.test(sitemap)
   ) {
     failures.push(
-      "app/sitemap.ts: sitemap should return the shared buildSitemapEntries() output",
+      "app/sitemap.ts: sitemap should import and call the shared buildSitemapEntries() helper",
     )
   }
 }

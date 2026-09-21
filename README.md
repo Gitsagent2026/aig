@@ -15,7 +15,7 @@ It is designed to support research-driven SEO workflows without hard-coded crede
   - Accepts competitor domains and backlink intent.
   - Marks these blocks as unsupported until a dedicated provider is configured.
 - **AI-assisted brief generation**
-  - Produces a structured SEO content brief from available research data.
+  - Produces a structured **templated** SEO content brief from available research data.
 - **Optional CRM lead hook**
   - Sends lead-conversion signals only when configured.
 

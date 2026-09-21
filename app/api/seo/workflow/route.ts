@@ -14,10 +14,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, result }, { status: 200 })
   } catch (error) {
+    console.error("SEO workflow request failed:", error)
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "SEO workflow failed",
+        error: "SEO workflow failed",
       },
       { status: 500 },
     )

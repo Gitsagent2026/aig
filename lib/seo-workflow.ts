@@ -43,6 +43,7 @@ export type SeoWorkflowResult = {
     internalLinkingGuidance: string[]
     schemaRecommendation: string[]
     measurementPlan: string[]
+    generationMode: "templated_rule_based"
     generatedBy: "template"
   }
   crmLeadHook: {
@@ -183,6 +184,7 @@ function buildTemplateBrief(
     internalLinkingGuidance: INTERNAL_LINKING_GUIDANCE,
     schemaRecommendation: SCHEMA_RECOMMENDATION,
     measurementPlan: MEASUREMENT_PLAN,
+    generationMode: "templated_rule_based",
     generatedBy: "template",
   }
 }

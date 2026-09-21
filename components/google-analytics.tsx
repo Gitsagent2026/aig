@@ -38,7 +38,7 @@ export function GoogleAnalytics() {
           gtag('config', '${measurementId}', {
             allow_google_signals: false,
             allow_ad_personalization_signals: false,
-            send_page_view: true
+            send_page_view: false
           });
         `}
       </Script>

@@ -1,7 +1,7 @@
 import {
+  CRAWLER_RELATED_SEARCHES,
   LAYOUT_DESCRIPTION,
   PAGE_H1_HEADING,
-  SITE_KEYWORDS,
 } from "@/lib/seo-metadata";
 import { SITE_DISPLAY_NAME, SITE_ORIGIN } from "@/lib/site-url";
 
@@ -178,7 +178,7 @@ export default function CrawlerSeoPage() {
           </div>
         </section>
 
-        {SITE_KEYWORDS.length > 0 ? (
+        {CRAWLER_RELATED_SEARCHES.length > 0 ? (
           <section
             style={{
               marginTop: 32,
@@ -186,16 +186,41 @@ export default function CrawlerSeoPage() {
               paddingTop: 24,
             }}
           >
+            <h2
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                color: "#374151",
+                margin: "0 0 12px",
+              }}
+            >
+              Related searches
+            </h2>
             <p
               style={{
                 fontSize: 14,
                 lineHeight: 1.6,
                 color: "#4b5563",
-                margin: 0,
+                margin: "0 0 12px",
               }}
             >
-              Related searches: {SITE_KEYWORDS.join(", ")}
+              Related searches: visitors often look for the Alliance Insurance
+              Group benefits portal using the searches below before reaching
+              this sign-in page.
             </p>
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: 20,
+                color: "#4b5563",
+                fontSize: 14,
+                lineHeight: 1.6,
+              }}
+            >
+              {CRAWLER_RELATED_SEARCHES.map((keyword) => (
+                <li key={keyword}>{keyword}</li>
+              ))}
+            </ul>
           </section>
         ) : null}
       </main>

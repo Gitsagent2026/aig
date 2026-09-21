@@ -1,9 +1,0 @@
-# undefined
-User-agent: undefined
-Disallow: *
-
-# Host
-Host: https://aig.wealthcareportal.com
-
-# Sitemaps
-Sitemap: https://aig.wealthcareportal.com/sitemap.xml

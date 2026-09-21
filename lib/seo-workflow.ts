@@ -292,7 +292,7 @@ export async function runSeoWorkflow(input: SeoWorkflowRequest): Promise<SeoWork
       competitorDomains.length > 0
         ? "Competitor boundaries were captured, but this repository currently has no active competitor-research data provider integration."
         : "No competitor domains were provided.",
-    data: competitorDomains.map((domain) => ({ domain, status: "queued" })),
+    data: competitorDomains.map((domain) => ({ domain, status: "skipped" })),
   }
 
   const backlinkResearch: SeoWorkflowResult["backlinkResearch"] = {
@@ -303,7 +303,7 @@ export async function runSeoWorkflow(input: SeoWorkflowRequest): Promise<SeoWork
       input.includeBacklinkResearch && competitorDomains.length > 0
         ? "Backlink research boundaries were captured, but this repository currently has no active backlink data provider integration."
         : "Backlink research was not requested or no competitors were provided.",
-    data: competitorDomains.map((domain) => ({ domain, status: "queued" })),
+    data: competitorDomains.map((domain) => ({ domain, status: "skipped" })),
   }
 
   const crmLeadHook = await sendLeadHookIfConfigured({

@@ -46,8 +46,8 @@ async function main() {
     fail("Google Analytics env gating is missing.")
   }
 
-  if (!gaComponent.includes("anonymize_ip")) {
-    fail("Google Analytics privacy configuration is missing anonymize_ip.")
+  if (!gaComponent.includes("allow_google_signals") || !gaComponent.includes("allow_ad_personalization_signals")) {
+    fail("Google Analytics privacy controls are missing.")
   }
 
   console.log("SEO workflow audit passed.")

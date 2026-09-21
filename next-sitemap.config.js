@@ -4,5 +4,4 @@ module.exports = {
   generateRobotsTxt: false, // app/robots.txt/route.ts is the source of truth
   // ...other options
   exclude: ["/admin/*", "/login", "/register"], // Exclude specific paths from the sitemap
-  exclude: ["/admin/*", "/login", "/register"], // Exclude specific paths from the sitemap
 };

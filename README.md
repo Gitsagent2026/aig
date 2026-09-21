@@ -53,7 +53,6 @@ If DataForSEO credentials are not set, the workflow reports `not_configured` for
 
 Google Analytics is only enabled when this value is present and valid. Configuration includes:
 
-- `anonymize_ip: true`
 - `allow_google_signals: false`
 - `allow_ad_personalization_signals: false`
 

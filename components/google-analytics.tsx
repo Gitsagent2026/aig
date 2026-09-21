@@ -22,7 +22,6 @@ export function GoogleAnalytics() {
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', '${measurementId}', {
-            anonymize_ip: true,
             allow_google_signals: false,
             allow_ad_personalization_signals: false,
             send_page_view: true

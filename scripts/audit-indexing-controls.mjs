@@ -7,6 +7,21 @@ const root = path.resolve(process.argv[2] ?? process.cwd())
 
 const failures = []
 
+function extractExportedStringArray(source, exportName) {
+  const match = source.match(
+    new RegExp(
+      `export\\s+const\\s+${exportName}\\s*=\\s*\\[(?<items>[\\s\\S]*?)\\]\\s*as\\s+const`,
+      "m",
+    ),
+  )
+  if (!match?.groups?.items) return null
+
+  return Array.from(
+    match.groups.items.matchAll(/["']([^"']+)["']/g),
+    ([, value]) => value,
+  )
+}
+
 function read(relPath) {
   const fullPath = path.join(root, relPath)
   if (!fs.existsSync(fullPath)) {
@@ -28,9 +43,23 @@ for (const relPath of [
 
 const indexing = read("lib/seo-indexing.ts")
 if (indexing) {
-  if (!/PUBLIC_UI_SITEMAP_PATHS = \["\/"\]/.test(indexing)) {
-    failures.push('lib/seo-indexing.ts: expected "/" to be the only sitemap allowlist route')
+  const publicUiRoutes = extractExportedStringArray(
+    indexing,
+    "PUBLIC_UI_SITEMAP_PATHS",
+  )
+  if (!publicUiRoutes) {
+    failures.push("lib/seo-indexing.ts: unable to parse PUBLIC_UI_SITEMAP_PATHS")
+  } else if (publicUiRoutes.length !== 1 || publicUiRoutes[0] !== "/") {
+    failures.push(
+      'lib/seo-indexing.ts: expected "/" to be the only sitemap allowlist route',
+    )
   }
+
+  const disallowRules = extractExportedStringArray(indexing, "ROBOTS_DISALLOW_RULES")
+  if (!disallowRules) {
+    failures.push("lib/seo-indexing.ts: unable to parse ROBOTS_DISALLOW_RULES")
+  }
+
   for (const expectedRule of [
     "/api/",
     "/authentication/handshake",
@@ -39,7 +68,7 @@ if (indexing) {
     "/verify-choice",
     "/verify-identity",
   ]) {
-    if (!indexing.includes(`"${expectedRule}"`)) {
+    if (!disallowRules?.includes(expectedRule)) {
       failures.push(`lib/seo-indexing.ts: missing disallow rule ${expectedRule}`)
     }
   }
@@ -47,8 +76,14 @@ if (indexing) {
 
 const sitemap = read("app/sitemap.ts")
 if (sitemap) {
-  if (!/buildSitemapEntries/.test(sitemap)) {
-    failures.push("app/sitemap.ts: sitemap should be generated from the shared allowlist")
+  if (
+    !/export\s+default\s+function\s+sitemap\s*\(\)\s*:\s*MetadataRoute\.Sitemap\s*\{[\s\S]*?return\s+buildSitemapEntries\(\)/m.test(
+      sitemap,
+    )
+  ) {
+    failures.push(
+      "app/sitemap.ts: sitemap should return the shared buildSitemapEntries() output",
+    )
   }
 }
 

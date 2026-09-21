@@ -160,6 +160,7 @@ import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
 
 import CrawlerSeoPage from "@/components/CrawlerSeoPage";
+import { GoogleAnalytics } from "@/components/google-analytics";
 import ProtectedLayout from "@/components/protected-layout";
 import { StripExtensionAttrs } from "@/components/StripExtensionAttrs";
 import { StructuredData } from "@/components/structured-data";
@@ -277,6 +278,7 @@ export default async function RootLayout({
       >
         <StripExtensionAttrs />
         <StructuredData />
+        <GoogleAnalytics />
         <ProtectedLayout>{children}</ProtectedLayout>
       </body>
     </html>

@@ -55,12 +55,14 @@ Google Analytics is only enabled when this value is present and valid. Configura
 
 - `allow_google_signals: false`
 - `allow_ad_personalization_signals: false`
+- client-side pageview tracking on route changes
 
 #### Optional CRM hook
 
 - `SEO_CRM_WEBHOOK_URL`
 
 When configured, the workflow sends a `seo_lead_signal` payload to this endpoint. When not configured, it safely reports `not configured`.
+Use an `https://` webhook URL in production (`http://localhost` is only allowed for local development).
 
 ## SEO fundamentals currently in app
 

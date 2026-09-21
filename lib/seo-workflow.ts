@@ -150,6 +150,20 @@ function buildTemplateBrief(
   keywordIdeas: KeywordIdea[],
   userSeedKeywords: string[],
 ): SeoWorkflowResult["contentBrief"] {
+  const BRIEF_SUMMARY =
+    "Build content that answers the main user intent first, then support it with semantically related sections, internal links, and measurable conversion goals."
+  const INTERNAL_LINKING_GUIDANCE = [
+    "Link from high-authority product and support pages using natural anchor text.",
+    "Add a contextual link near the first fold to the primary conversion path.",
+    "Cross-link related FAQs to strengthen topical clusters.",
+  ]
+  const SCHEMA_RECOMMENDATION = ["WebPage", "FAQPage (only if visible FAQ exists)", "BreadcrumbList (for nested pages)"]
+  const MEASUREMENT_PLAN = [
+    "Track impressions, clicks, and average position in Search Console.",
+    "Track engagement and conversion events in configured analytics.",
+    "Review and refresh content based on real query deltas every 2-4 weeks.",
+  ]
+
   const primaryKeyword = keywordIdeas[0]?.keyword || userSeedKeywords[0] || topic
   const secondaryKeywords = [
     ...keywordIdeas.slice(1, 6).map((x) => x.keyword),
@@ -158,8 +172,7 @@ function buildTemplateBrief(
 
   return {
     title: `${primaryKeyword} guide`,
-    summary:
-      "Build content that answers the main user intent first, then support it with semantically related sections, internal links, and measurable conversion goals.",
+    summary: BRIEF_SUMMARY,
     primaryKeyword,
     secondaryKeywords,
     suggestedHeadings: [
@@ -167,17 +180,9 @@ function buildTemplateBrief(
       `${primaryKeyword}: eligibility, setup, and common mistakes`,
       `${primaryKeyword} checklist and next steps`,
     ],
-    internalLinkingGuidance: [
-      "Link from high-authority product and support pages using natural anchor text.",
-      "Add a contextual link near the first fold to the primary conversion path.",
-      "Cross-link related FAQs to strengthen topical clusters.",
-    ],
-    schemaRecommendation: ["WebPage", "FAQPage (only if visible FAQ exists)", "BreadcrumbList (for nested pages)"],
-    measurementPlan: [
-      "Track impressions, clicks, and average position in Search Console.",
-      "Track engagement and conversion events in configured analytics.",
-      "Review and refresh content based on real query deltas every 2-4 weeks.",
-    ],
+    internalLinkingGuidance: INTERNAL_LINKING_GUIDANCE,
+    schemaRecommendation: SCHEMA_RECOMMENDATION,
+    measurementPlan: MEASUREMENT_PLAN,
     generatedBy: "template",
   }
 }
@@ -199,14 +204,27 @@ async function sendLeadHookIfConfigured(payload: {
   }
 
   let endpointHost: string | null = null
+  let parsedUrl: URL
   try {
-    endpointHost = new URL(url).host
+    parsedUrl = new URL(url)
+    endpointHost = parsedUrl.host
   } catch {
     return {
       configured: true,
       delivered: false,
       endpointHost: null,
       note: "SEO_CRM_WEBHOOK_URL is invalid.",
+    }
+  }
+
+  const allowInsecureLocalhost =
+    process.env.NODE_ENV !== "production" && (parsedUrl.hostname === "localhost" || parsedUrl.hostname === "127.0.0.1")
+  if (parsedUrl.protocol !== "https:" && !allowInsecureLocalhost) {
+    return {
+      configured: true,
+      delivered: false,
+      endpointHost,
+      note: "SEO_CRM_WEBHOOK_URL must use HTTPS (localhost HTTP is allowed outside production).",
     }
   }
 

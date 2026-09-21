@@ -1,3 +1,7 @@
+"use client"
+
+import { useEffect } from "react"
+import { usePathname, useSearchParams } from "next/navigation"
 import Script from "next/script"
 
 function normalizedMeasurementId(): string | null {
@@ -7,7 +11,17 @@ function normalizedMeasurementId(): string | null {
 }
 
 export function GoogleAnalytics() {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const measurementId = normalizedMeasurementId()
+
+  useEffect(() => {
+    if (!measurementId || typeof window === "undefined" || typeof window.gtag !== "function") return
+    const query = searchParams?.toString()
+    const pagePath = query ? `${pathname}?${query}` : pathname
+    window.gtag("config", measurementId, { page_path: pagePath })
+  }, [measurementId, pathname, searchParams])
+
   if (!measurementId) return null
 
   return (
@@ -30,4 +44,10 @@ export function GoogleAnalytics() {
       </Script>
     </>
   )
+}
+
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void
+  }
 }

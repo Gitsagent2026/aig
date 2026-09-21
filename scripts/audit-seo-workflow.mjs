@@ -24,6 +24,7 @@ function fail(message) {
 async function main() {
   const seoWorkflow = await read("lib/seo-workflow.ts")
   const seoRoute = await read("app/api/seo/workflow/route.ts")
+  const seoRequestNormalizer = await read("lib/seo-workflow-request.mjs")
   const gaComponent = await read("components/google-analytics.tsx")
 
   if (!seoWorkflow.includes("DATAFORSEO_LOGIN") || !seoWorkflow.includes("DATAFORSEO_PASSWORD")) {
@@ -38,8 +39,12 @@ async function main() {
     fail("Detected hard-coded DataForSEO credential value.")
   }
 
-  if (!seoRoute.includes("topic is required")) {
-    fail("SEO workflow route input validation appears incomplete.")
+  if (!seoRoute.includes("normalizeSeoWorkflowPayload")) {
+    fail("SEO workflow route must use normalization helper validation.")
+  }
+
+  if (!seoRequestNormalizer.includes("topic is required")) {
+    fail("SEO workflow normalization helper must enforce topic validation.")
   }
 
   if (!gaComponent.includes("NEXT_PUBLIC_GA_MEASUREMENT_ID")) {

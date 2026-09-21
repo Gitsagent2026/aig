@@ -9,6 +9,7 @@
     "postbuild": "node scripts/notify-indexnow.mjs",
     "dev": "next dev --webpack",
     "lint": "eslint .",
+    "test:seo-workflow": "node --test lib/seo-workflow-request.test.mjs",
     "start": "next start"
   },
   "dependencies": {

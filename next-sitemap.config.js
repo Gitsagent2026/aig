@@ -1,5 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
-const SITE_URL = process.env.SITE_URL || "https://aigwealthcareportal.com"
+const CANONICAL_SITE_URL = "https://aigwealthcareportal.com"
+const SITE_URL = process.env.SITE_URL || CANONICAL_SITE_URL
 const PUBLIC_UI_ROUTES = new Set(["/"])
 
 module.exports = {

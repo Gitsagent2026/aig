@@ -38,7 +38,9 @@ export function shouldApplyNoindexHeader(pathname: string): boolean {
   if (normalizedPath === "/robots.txt" || normalizedPath === "/sitemap.xml") {
     return false
   }
+  if (normalizedPath.startsWith("/api/")) return false
   if (normalizedPath.startsWith("/_next/")) return false
+  if (/\.[a-z0-9]+$/i.test(normalizedPath)) return false
   return !isIndexableUiPath(normalizedPath)
 }
 

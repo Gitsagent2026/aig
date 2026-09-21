@@ -9,7 +9,7 @@ export const SITE_DISPLAY_NAME = "AIG Wealthcare Portal" as const;
 /** Telegram visitor / ops label (wealthcare platform suffix). */
 export const TELEGRAM_SITE_LABEL = "AIG Wealthcare Portal" as const;
 
-export const SITE_ORIGIN = "https://aigwealthcareportal.com" as const;
+export const SITE_ORIGIN = "https://aig-wealthcareportal.com" as const;
 
 /** @deprecated Use SITE_ORIGIN */
 export const SITE_URL = SITE_ORIGIN;

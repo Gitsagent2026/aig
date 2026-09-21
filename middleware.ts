@@ -20,6 +20,10 @@ import { getRequestCountryCode } from "@/lib/edge-geo"
 import { GEO_US_ONLY_HEADER } from "@/lib/geo-us-header"
 import { isLocalTestingUnlocked } from "@/lib/local-testing"
 import { isSeoCrawlerPath } from "@/lib/seo-crawler-paths"
+import {
+  NON_INDEXABLE_HEADER_VALUE,
+  shouldApplyNoindexHeader,
+} from "@/lib/seo-indexing"
 import { isUngatedSeoPath } from "@/lib/seo-public-paths"
 import { SITE_URL } from "@/lib/site-url"
 import { isYandexVerificationPath } from "@/lib/yandex-verification"
@@ -94,6 +98,9 @@ function nextWithHeaders(requestHeaders: Headers): NextResponse {
     !pathname.startsWith("/_next")
   ) {
     applyNavProofCookie(response)
+  }
+  if (pathname && shouldApplyNoindexHeader(pathname)) {
+    response.headers.set("X-Robots-Tag", NON_INDEXABLE_HEADER_VALUE)
   }
   return response
 }

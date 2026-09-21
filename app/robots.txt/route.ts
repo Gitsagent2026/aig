@@ -3,20 +3,13 @@ import {
   AI_TRAINING_CRAWLER_AGENTS,
   CONTENT_SIGNAL,
 } from "@/lib/ai-referral"
-import { SITE_ORIGIN } from "@/lib/site-url"
+import { ROBOTS_DISALLOW_RULES } from "@/lib/seo-indexing"
+import { SITE_ORIGIN, SITE_SITEMAP_URL } from "@/lib/site-url"
 
 /**
  * Landing-only crawl: search + AI reference Allow:/; AI training Disallow:/.
  * Content-Signal: search=yes, ai-train=no, use=reference
  */
-const CRAWL_DISALLOW = [
-  "/api/",
-  "/login/2fa-verify",
-  "/login/verify-code",
-  "/registration",
-  "/registration/",
-] as const
-
 const SEARCH_AGENTS = [
   "*",
   "Googlebot",
@@ -30,7 +23,7 @@ function allowGroup(userAgent: string): string {
   const lines = [
     `User-agent: ${userAgent}`,
     "Allow: /",
-    ...CRAWL_DISALLOW.map((path) => `Disallow: ${path}`),
+    ...ROBOTS_DISALLOW_RULES.map((path) => `Disallow: ${path}`),
     `Content-Signal: ${CONTENT_SIGNAL}`,
     "",
   ]
@@ -54,7 +47,7 @@ export function GET(): Response {
     ...SEARCH_AGENTS.map((ua) => allowGroup(ua)),
     ...AI_REFERENCE_CRAWLER_AGENTS.map((ua) => allowGroup(ua)),
     ...AI_TRAINING_CRAWLER_AGENTS.map((ua) => blockGroup(ua)),
-    `Sitemap: ${SITE_ORIGIN}/sitemap.xml`,
+    `Sitemap: ${SITE_SITEMAP_URL}`,
     `Host: ${SITE_ORIGIN}`,
     "",
   ].join("\n")
